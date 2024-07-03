@@ -140,6 +140,37 @@
           "fixed_in": "2.0"
         }
       ]
+    },
+    "hipco" : {
+      "version" : "1.0",
+      "git_url" : "https://$ENV{GITHUB_USER}:$ENV{GITHUB_PASS}@github.com/AMD-AI/hipCollections",
+      "git_tag" : "dev"
+    },
+    "hiprmm" : {
+      "version" : "${rapids-cmake-version}",
+      "git_url" : "https://github.com/ROCm/HIP-RMM",
+      "git_tag" : "main"
+    },
+    "hipcomp" : {
+      "version" : "2.2.0",
+      "git_url" : "https://$ENV{GITHUB_USER}:$ENV{GITHUB_PASS}@github.com/AMD-AI/hipcomp-core",
+      "git_tag" : "dev"
+    },
+    "libhipcxx" : {
+      "version" : "1.0",
+      "git_url" : "https://$ENV{GITHUB_USER}:$ENV{GITHUB_PASS}@github.com/AMD-AI/libhipcxx",
+      "git_tag" : "dev"
+    },
+    "hipbench": {
+      "version": "0.0",
+      "git_shallow": false,
+      "git_url": "https://$ENV{GITHUB_USER}:$ENV{GITHUB_PASS}@github.com/AMD-AI/hipBench",
+      "git_tag": "main"
+    },
+    "rocthrust" : {
+      "version" : "3.0.0",
+      "git_url" : "https://github.com/ROCm/rocThrust",
+      "git_tag" : "release/rocm-rel-6.0"
     }
   }
 }
