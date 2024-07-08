@@ -146,9 +146,9 @@
       "git_url" : "https://$ENV{GITHUB_USER}:$ENV{GITHUB_PASS}@github.com/AMD-AI/hipCollections",
       "git_tag" : "dev"
     },
-    "hiprmm" : {
+    "rmm-rocm" : {
       "version" : "${rapids-cmake-version}",
-      "git_url" : "https://github.com/ROCm/HIP-RMM",
+      "git_url" : "https://github.com/ROCm/rocm-rmm",
       "git_tag" : "main"
     },
     "hipcomp" : {
