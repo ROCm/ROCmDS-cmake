@@ -119,7 +119,7 @@ function(rapids_cpm_hipco)
                   PATCH_COMMAND ${patch_command}
                   EXCLUDE_FROM_ALL ${to_exclude}
                   OPTIONS "BUILD_TESTS OFF" "BUILD_BENCHMARKS OFF" "BUILD_EXAMPLES OFF"
-                          "INSTALL_hipco ${to_install}")
+                          "INSTALL_HIPCO ${to_install}")
 
   if (HIP_AS_CUDA)
     add_library(cuco::cuco ALIAS hipco::hipco)
