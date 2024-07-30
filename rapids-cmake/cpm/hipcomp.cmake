@@ -154,13 +154,15 @@ function(rapids_cpm_hipcomp)
   # provide consistent targets between a found hipcomp and one building from source
   if(NOT TARGET hipcomp::hipcomp AND TARGET hipcomp)
     add_library(hipcomp::hipcomp ALIAS hipcomp)
+    set(hipcomp_orig hipcomp)
   elseif(TARGET hipcomp::hipcomp AND NOT TARGET hipcomp)
     add_library(hipcomp ALIAS hipcomp::hipcomp)
+    set(hipcomp_orig hipcomp::hipcomp)
   endif()
 
   if (HIP_AS_CUDA)
-    add_library(nvcomp::nvcomp ALIAS hipcomp::hipcomp)
-    add_library(nvcomp ALIAS hipcomp)
+    add_library(nvcomp::nvcomp ALIAS hipcomp_orig)
+    add_library(nvcomp ALIAS hipcomp_orig)
   endif()
 
   # Propagate up variables that CPMFindPackage provide
