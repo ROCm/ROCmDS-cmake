@@ -90,7 +90,7 @@ endfunction()
 
 if (HIP_AS_CUDA)
   function(rapids_cuda_init_runtime use_static value)
-    rapids_hip_init_runtime(use_static value)
+    rapids_hip_init_runtime(${use_static} ${value})
     # TODO(HIP/AMD): Check if this is a good idea.
     set(CMAKE_CUDA_RUNTIME_LIBRARY ${CMAKE_HIP_RUNTIME_LIBRARY} PARENT_SCOPE)
     set(CUDA_USE_STATIC_CUDA_RUNTIME ${HIP_USE_STATIC_HIP_RUNTIME} PARENT_SCOPE)
