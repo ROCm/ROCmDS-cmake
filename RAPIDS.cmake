@@ -48,19 +48,19 @@ endif()
 # Allow users to control which GitHub repo is fetched
 if(NOT rapids-cmake-repo)
   # Define a default repo if the user doesn't set one
-  set(rapids-cmake-repo AMD-AI/rapids-cmake)
+  set(rapids-cmake-repo ROCm/rapids-cmake)
 endif()
 
 # Allow users to control which branch is fetched
 if(NOT rapids-cmake-branch)
   # Define a default branch if the user doesn't set one
-  set(rapids-cmake-branch "hipdf-dev")
+  set(rapids-cmake-branch "branch-24.06")
 endif()
 
 # Allow users to control the exact URL passed to FetchContent
 if(NOT rapids-cmake-url)
   # Construct a default URL if the user doesn't set one
-  set(rapids-cmake-url "https://$ENV{GITHUB_USER}:$ENV{GITHUB_PASS}@github.com/${rapids-cmake-repo}/")
+  set(rapids-cmake-url "https://github.com/${rapids-cmake-repo}/")
   # In order of specificity
   if(rapids-cmake-fetch-via-git)
     if(rapids-cmake-sha)
