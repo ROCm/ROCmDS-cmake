@@ -148,7 +148,7 @@
     },
     "rmm-rocm" : {
       "version" : "${rapids-cmake-version}",
-      "git_url" : "https://github.com/ROCm/rocm-rmm",
+      "git_url" : "https://github.com/ROCm/rmm-rocm",
       "git_tag" : "main"
     },
     "hipcomp" : {
