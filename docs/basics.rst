@@ -14,7 +14,7 @@ via CMake's `FetchContent <https://cmake.org/cmake/help/latest/module/FetchConte
   cmake_minimum_required(...)
 
   if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/<PROJ>_RAPIDS.cmake)
-    file(DOWNLOAD https://$ENV{GITHUB_USER}:$ENV{GITHUB_PASS}@raw.githubusercontent.com/AMD-AI/rapids-cmake/main/RAPIDS.cmake
+    file(DOWNLOAD https://raw.githubusercontent.com/ROCm/rapids-cmake/branch-24.06/RAPIDS.cmake
       ${CMAKE_CURRENT_BINARY_DIR}/<PROJ>_RAPIDS.cmake)
   endif()
   include(${CMAKE_CURRENT_BINARY_DIR}/<PROJ>_RAPIDS.cmake)
@@ -25,8 +25,6 @@ via CMake's `FetchContent <https://cmake.org/cmake/help/latest/module/FetchConte
   include(rapids-find)
 
   project(...)
-
-A rapids-cmake user must authenticate to AMD-AI organization using environment variables GITHUB_USER and GITHUB_PASS. A personnel access token can be used for GITHUB_PASS.
 
 Usage
 *****
@@ -62,7 +60,7 @@ like this:
     GIT_REPOSITORY https://github.com/<my_fork>/rapids-cmake.git
     GIT_TAG        <my_feature_branch>
   )
-  file(DOWNLOAD https://$ENV{GITHUB_USER}:$ENV{GITHUB_PASS}@raw.githubusercontent.com/AMD-AI/rapids-cmake/main/RAPIDS.cmake
+  file(DOWNLOAD https://raw.githubusercontent.com/ROCm/rapids-cmake/branch-24.06/RAPIDS.cmake
       ${CMAKE_CURRENT_BINARY_DIR}/RAPIDS.cmake)
   include(${CMAKE_CURRENT_BINARY_DIR}/RAPIDS.cmake)
 
