@@ -13,9 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #=============================================================================
-#
-# This is the preferred entry point for projects using rapids-cmake
-#
 # MIT License
 #
 # Modifications Copyright (c) 2023-2024 Advanced Micro Devices, Inc.
@@ -38,6 +35,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #=============================================================================
+#
+# This is the preferred entry point for projects using rapids-cmake
+#
 
 # Allow users to control which version is used
 if(NOT rapids-cmake-version)
