@@ -130,13 +130,14 @@ function(rapids_cpm_rocthrust)
 
     rapids_cpm_find(rocthrust ${version} ${ARGN} ${_RAPIDS_UNPARSED_ARGUMENTS}
                     GLOBAL_TARGETS rocthrust roc::rocthrust
-                    CPM_ARGS FIND_PACKAGE_ARGUMENTS EXACT
-                    GIT_REPOSITORY ${repository}
-                    GIT_TAG ${tag}
-                    GIT_SHALLOW ${shallow}
-                    PATCH_COMMAND ${patch_command}
-                    EXCLUDE_FROM_ALL ${exclude}
-                    OPTIONS "DOWNLOAD_ROCPRIM ON")
+                    CPM_ARGS
+                      # FIND_PACKAGE_ARGUMENTS EXACT # we also accept more recent versions
+                      GIT_REPOSITORY ${repository}
+                      GIT_TAG ${tag}
+                      GIT_SHALLOW ${shallow}
+                      PATCH_COMMAND ${patch_command}
+                      EXCLUDE_FROM_ALL ${exclude}
+                      OPTIONS "DOWNLOAD_ROCPRIM ON")
 
   set(CPM_USE_LOCAL_PACKAGES tmp_CPM_USE_LOCAL_PACKAGES) # restore original value
   set(CPM_LOCAL_PACKAGES_ONLY tmp_CPM_LOCAL_PACKAGES_ONLY) # restore original value
