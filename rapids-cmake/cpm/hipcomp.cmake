@@ -161,8 +161,12 @@ function(rapids_cpm_hipcomp)
   endif()
 
   if (HIP_AS_CUDA)
-    add_library(nvcomp::nvcomp ALIAS ${hipcomp_orig})
-    add_library(nvcomp ALIAS ${hipcomp_orig})
+    if (NOT DEFINED nvcomp::nvcomp)
+      add_library(nvcomp::nvcomp ALIAS ${hipcomp_orig})
+    endif()
+    if (NOT DEFINED nvcomp)
+      add_library(nvcomp ALIAS ${hipcomp_orig})
+    endif()
   endif()
 
   # Propagate up variables that CPMFindPackage provide
