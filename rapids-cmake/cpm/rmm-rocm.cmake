@@ -97,7 +97,7 @@ function(rapids_cpm_rmm_rocm)
   rapids_cpm_generate_patch_command(rmm-rocm ${version} patch_command)
 
   include("${rapids-cmake-dir}/cpm/find.cmake")
-  rapids_cpm_find(rmm-rocm ${version} ${ARGN} {_RAPIDS_UNPARSED_ARGUMENTS}
+  rapids_cpm_find(rmm ${version} ${ARGN} {_RAPIDS_UNPARSED_ARGUMENTS}
                   GLOBAL_TARGETS rmm::rmm
                   CPM_ARGS
                   GIT_REPOSITORY ${repository}
