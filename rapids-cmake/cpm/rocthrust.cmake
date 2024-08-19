@@ -55,8 +55,18 @@ tracking of these dependencies for correct export support.
 .. |PKG_NAME| replace:: rocthrust
 .. include:: common_package_args.txt
 
+IMPORTANT: Only support for local rocThrust installation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This module is currently implemented to always look for a local
+rocThrust installation. Installation via download is not supported
+right now. This means that the `PREFER_LOCAL` and `USE_LOCAL`
+options (cf. next section) do not have any effect.
+
 Prefer/Use Local rocThrust Installation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+(IMPORTANT: This section describes a feature that is not implemented currently.)
 
 If you specify the key-value pair `PREFER_LOCAL ON`, this function first look for a local
 version of `rocThrust`, e.g., one from a ROCm installation.
@@ -103,61 +113,71 @@ function(rapids_cpm_rocthrust)
   set(multi_value)
   cmake_parse_arguments(_RAPIDS "${options}" "${one_value}" "${multi_value}" ${ARGN})
 
+  # Fix up RAPIDS_UNPARSED_ARGUMENTS to have EXPORT_SETS as this is need for rapids_cpm_find
+  if(_RAPIDS_INSTALL_EXPORT_SET)
+    list(APPEND _RAPIDS_UNPARSED_ARGUMENTS INSTALL_EXPORT_SET ${_RAPIDS_INSTALL_EXPORT_SET})
+  endif()
+  if(_RAPIDS_BUILD_EXPORT_SET)
+    list(APPEND _RAPIDS_UNPARSED_ARGUMENTS BUILD_EXPORT_SET ${_RAPIDS_BUILD_EXPORT_SET})
+  endif()
+
   include("${rapids-cmake-dir}/cpm/detail/package_details.cmake")
   rapids_cpm_package_details(rocthrust version repository tag shallow exclude)
+  set(to_exclude OFF)
+  if(NOT _RAPIDS_INSTALL_EXPORT_SET OR exclude)
+    set(to_exclude ON)
+  endif()
 
   include("${rapids-cmake-dir}/cpm/detail/generate_patch_command.cmake")
   rapids_cpm_generate_patch_command(rocthrust ${version} patch_command)
 
   include("${rapids-cmake-dir}/cpm/find.cmake")
 
-  set(tmp_CPM_USE_LOCAL_PACKAGES CPM_USE_LOCAL_PACKAGES) # memorize original value
-  set(tmp_CPM_LOCAL_PACKAGES_ONLY CPM_LOCAL_PACKAGES_ONLY) # memorize original value
+  # # note: order doesn't matter
+  # if (_RAPIDS_PREFER_LOCAL)
+  #   set(CPM_USE_LOCAL_PACKAGES ON)
+  # elseif($ENV{RAPIDS_CMAKE_ROCTHRUST_PREFER_LOCAL}) # note: can't OR with if condition as $ENV{..} may eval to ""
+  #   set(CPM_USE_LOCAL_PACKAGES ON)
+  # endif()
 
-    # note: order doesn't matter
-    if (_RAPIDS_PREFER_LOCAL)
-      set(CPM_USE_LOCAL_PACKAGES ON)
-    elseif($ENV{RAPIDS_CMAKE_ROCTHRUST_PREFER_LOCAL}) # note: can't OR with if condition as $ENV{..} may eval to ""
-      set(CPM_USE_LOCAL_PACKAGES ON)
-    endif()
+  set(CPM_LOCAL_PACKAGES_ONLY ON) # always look for a local package for the time being
+  # note: order doesn't matter
+  # if (_RAPIDS_USE_LOCAL)
+  #   set(CPM_LOCAL_PACKAGES_ONLY ON)
+  # elseif($ENV{RAPIDS_CMAKE_ROCTHRUST_USE_LOCAL}) # note: can't OR with if condition as $ENV{..} may eval to ""
+  #   set(CPM_LOCAL_PACKAGES_ONLY ON)
+  # endif()
 
-    # note: order doesn't matter
-    if (_RAPIDS_USE_LOCAL)
-      set(CPM_LOCAL_PACKAGES_ONLY ON)
-    elseif($ENV{RAPIDS_CMAKE_ROCTHRUST_USE_LOCAL}) # note: can't OR with if condition as $ENV{..} may eval to ""
-      set(CPM_LOCAL_PACKAGES_ONLY ON)
-    endif()
+  rapids_cpm_find(rocthrust ${version} ${_RAPIDS_UNPARSED_ARGUMENTS}
+                  GLOBAL_TARGETS roc::rocthrust roc::rocprim_hip roc::hipstdpar
+                  CPM_ARGS
+                    # FIND_PACKAGE_ARGUMENTS EXACT # we also accept more recent versions
+                    GIT_REPOSITORY ${repository}
+                    GIT_TAG ${tag}
+                    GIT_SHALLOW ${shallow}
+                    PATCH_COMMAND ${patch_command}
+                    EXCLUDE_FROM_ALL ${to_exclude}
+                    OPTIONS "DOWNLOAD_ROCPRIM ON")
 
-    rapids_cpm_find(rocthrust ${version} ${ARGN} ${_RAPIDS_UNPARSED_ARGUMENTS}
-                    GLOBAL_TARGETS rocthrust roc::rocthrust
-                    CPM_ARGS
-                      # FIND_PACKAGE_ARGUMENTS EXACT # we also accept more recent versions
-                      GIT_REPOSITORY ${repository}
-                      GIT_TAG ${tag}
-                      GIT_SHALLOW ${shallow}
-                      PATCH_COMMAND ${patch_command}
-                      EXCLUDE_FROM_ALL ${exclude}
-                      OPTIONS "DOWNLOAD_ROCPRIM ON")
+  # if (NOT TARGET roc::rocthrust AND TARGET rocthrust)
+  #   if (NOT DEFINED rocthrust_BINARY_DIR)
+  #     message(rocthrust_BINARY_DIR "Expected variable rocthrust_BINARY_DIR to be defined")
+  #   endif()
+  #   # Target is named 'rocthrust' if this is NOT a local installation.
 
-  set(CPM_USE_LOCAL_PACKAGES tmp_CPM_USE_LOCAL_PACKAGES) # restore original value
-  set(CPM_LOCAL_PACKAGES_ONLY tmp_CPM_LOCAL_PACKAGES_ONLY) # restore original value
+  #   # CPM runs the rocThrust CMakeLists.txt, which creates the CMake package file
+  #   # _deps/rocthrust-build/thrust/rocthrust-config.cmake.
+  #   # Below, we specify the parent dir of this file as `find_package` search dir
+  #   # for `rocthrust`.
+  #   include("${rapids-cmake-dir}/export/find_package_root.cmake")
+  #   rapids_export_find_package_root(BUILD rocthrust "${rocthrust_BINARY_DIR}/thrust"
+  #                                   EXPORT_SET ${_RAPIDS_BUILD_EXPORT_SET})
+  # elseif(NOT TARGET roc::rocthrust)
+  #   message(FATAL_ERROR "Expected rocthrust or roc::rocthrust to exist")
+  # endif()
 
-  if (NOT TARGET roc::rocthrust AND TARGET rocthrust)
-    # target is named 'rocthrust' if this NOT a local installation
-    add_library(roc::rocthrust ALIAS rocthrust)
-    if(_RAPIDS_BUILD_EXPORT_SET)
-      install(TARGETS rocthrust EXPORT ${_RAPIDS_BUILD_EXPORT_SET})
-    endif()
-  elseif(NOT TARGET roc::rocthrust)
-    message(FATAL_ERROR "Expected rocthrust or roc::rocthrust to exist")
-  endif()
-
-  if (NOT DEFINED rocthrust_BINARY_DIR)
-    message(rocthrust_BINARY_DIR "Expected variable rocthrust_BINARY_DIR to be defined")
-  endif()
-
-  include("${rapids-cmake-dir}/cpm/detail/display_patch_status.cmake")
-  rapids_cpm_display_patch_status(rocthrust)
+  # include("${rapids-cmake-dir}/cpm/detail/display_patch_status.cmake")
+  # rapids_cpm_display_patch_status(rocthrust)
 
   # Propagate up variables that CPMFindPackage provide
   set(rocthrust_SOURCE_DIR "${rocthrust_SOURCE_DIR}" PARENT_SCOPE)
