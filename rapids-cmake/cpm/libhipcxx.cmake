@@ -127,6 +127,7 @@ function(rapids_cpm_libhipcxx)
     # the headers to `include/rapids/libhipcxx`
     include(GNUInstallDirs)
     set(CMAKE_INSTALL_INCLUDEDIR "${CMAKE_INSTALL_INCLUDEDIR}/rapids/libhipcxx")
+    set(CMAKE_INSTALL_LIBDIR "${CMAKE_INSTALL_LIBDIR}/rapids/")
 
     # libhipcxx 1.8 has a bug where it doesn't generate proper exclude rules for the
     # `[cub|libhipcxx]-header-search` files, which causes the build tree version to be installed
