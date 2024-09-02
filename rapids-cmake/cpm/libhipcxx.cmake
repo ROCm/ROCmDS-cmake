@@ -106,7 +106,10 @@ function(rapids_cpm_libhipcxx)
                                     EXPORT_SET ${_RAPIDS_BUILD_EXPORT_SET})
   endif()
 
-  if(libhipcxx_SOURCE_DIR AND _RAPIDS_INSTALL_EXPORT_SET AND NOT exclude)
+  get_property(rapids_libhipcxx_install_rules_already_called GLOBAL
+  PROPERTY rapids_libhipcxx_install_rules_already_called SET)
+  if(libhipcxx_SOURCE_DIR AND _RAPIDS_INSTALL_EXPORT_SET AND NOT rapids_libhipcxx_install_rules_already_called AND NOT exclude)
+    set_property(GLOBAL PROPERTY rapids_libhipcxx_install_rules_already_called ON)
     # By default if we allow libhipcxx to install into `CMAKE_INSTALL_INCLUDEDIR` alongside rmm (or
     # other packages) we will get a install tree that looks like this:
 
