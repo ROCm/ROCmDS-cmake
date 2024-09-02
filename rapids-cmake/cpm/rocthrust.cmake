@@ -149,7 +149,6 @@ function(rapids_cpm_rocthrust)
   # endif()
 
   rapids_cpm_find(rocthrust ${version} ${_RAPIDS_UNPARSED_ARGUMENTS}
-                  GLOBAL_TARGETS roc::rocthrust roc::rocprim_hip roc::hipstdpar
                   CPM_ARGS
                     # FIND_PACKAGE_ARGUMENTS EXACT # we also accept more recent versions
                     GIT_REPOSITORY ${repository}
