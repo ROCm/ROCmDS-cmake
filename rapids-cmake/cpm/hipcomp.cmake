@@ -55,12 +55,18 @@ across all RAPIDS projects.
   rapids_cpm_hipcomp( [USE_PROPRIETARY_BINARY <ON|OFF>]
                      [BUILD_EXPORT_SET <export-name>]
                      [INSTALL_EXPORT_SET <export-name>]
+                     [BUILD_STATIC] <build-static>
                      [<CPM_ARGS> ...])
 
-.. note:
-  If the option `HIP_AS_CUDA` is set, ``cuco_`` prefixed result variables are available too after calling this function.
+The argument `BUILD_STATIC` can be used to specify if the libhipcomp library
+should be built as a static or shared object. Defaults to `ON`. You can also
+use `RAPIDS_CMAKE_HIPCOMP_BUILD_STATIC` to specify this option. If both are
+specified, the argument overrules the environment variable.
 
-.. |PKG_NAME| replace:: hipcomp
+.. note:
+
+  If the option `HIP_AS_CUDA` is set, ``nvcomp_`` prefixed result variables are available too after calling this function.
+
 .. include:: common_package_args.txt
 
 Result Targets
@@ -87,7 +93,7 @@ function(rapids_cpm_hipcomp)
   list(APPEND CMAKE_MESSAGE_CONTEXT "rapids.cpm.hipcomp")
 
   set(options)
-  set(one_value USE_PROPRIETARY_BINARY BUILD_EXPORT_SET INSTALL_EXPORT_SET)
+  set(one_value USE_PROPRIETARY_BINARY BUILD_EXPORT_SET INSTALL_EXPORT_SET BUILD_STATIC)
   set(multi_value)
   cmake_parse_arguments(_RAPIDS "${options}" "${one_value}" "${multi_value}" ${ARGN})
 
@@ -137,6 +143,14 @@ function(rapids_cpm_hipcomp)
   endif()
 
   include("${rapids-cmake-dir}/cpm/find.cmake")
+
+  set(BUILD_STATIC ON) # default behavior
+  if(DEFINED ENV{RAPIDS_CMAKE_HIPCOMP_BUILD_STATIC})
+    set(BUILD_STATIC $ENV{RAPIDS_CMAKE_HIPCOMP_BUILD_STATIC})
+  endif()
+  if(DEFINED _RAPIDS_BUILD_STATIC) # overrules environment variable
+    set(BUILD_STATIC _RAPIDS_BUILD_STATIC)
+  endif()
   rapids_cpm_find(hipcomp ${version} ${_RAPIDS_UNPARSED_ARGUMENTS}
                   GLOBAL_TARGETS hipcomp::hipcomp
                   CPM_ARGS
@@ -145,7 +159,7 @@ function(rapids_cpm_hipcomp)
                   GIT_SHALLOW ${shallow}
                   EXCLUDE_FROM_ALL ${to_exclude}
                   PATCH_COMMAND ${patch_command}
-                  OPTIONS "BUILD_STATIC ON" "BUILD_TESTS OFF" "BUILD_BENCHMARKS OFF"
+                  OPTIONS "BUILD_STATIC ${BUILD_STATIC}" "BUILD_TESTS OFF" "BUILD_BENCHMARKS OFF"
                           "BUILD_EXAMPLES OFF")
 
   include("${rapids-cmake-dir}/cpm/detail/display_patch_status.cmake")
