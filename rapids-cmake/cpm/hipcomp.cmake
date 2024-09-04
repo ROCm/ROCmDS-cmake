@@ -149,7 +149,7 @@ function(rapids_cpm_hipcomp)
     set(BUILD_STATIC $ENV{RAPIDS_CMAKE_HIPCOMP_BUILD_STATIC})
   endif()
   if(DEFINED _RAPIDS_BUILD_STATIC) # overrules environment variable
-    set(BUILD_STATIC _RAPIDS_BUILD_STATIC)
+    set(BUILD_STATIC ${_RAPIDS_BUILD_STATIC})
   endif()
   rapids_cpm_find(hipcomp ${version} ${_RAPIDS_UNPARSED_ARGUMENTS}
                   GLOBAL_TARGETS hipcomp::hipcomp
