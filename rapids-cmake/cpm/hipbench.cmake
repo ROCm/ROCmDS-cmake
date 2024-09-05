@@ -94,7 +94,6 @@ Result Variables
 
 #]=======================================================================]
 function(rapids_cpm_hipbench)
-  #: note(HIP/AMD): 
   list(APPEND CMAKE_MESSAGE_CONTEXT "rapids.cpm.hipbench")
 
   set(to_install FALSE)
@@ -149,3 +148,9 @@ function(rapids_cpm_hipbench)
 
   # nvbench creates the correct namespace aliases
 endfunction()
+
+if (HIP_AS_CUDA)
+  function(rapids_cpm_nvbench)
+    rapids_cpm_hipbench(${ARGN})
+  endfunction()
+endif()
