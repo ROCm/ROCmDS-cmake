@@ -129,8 +129,16 @@ function(rapids_cpm_hipbench)
                           "NVBench_ENABLE_TESTING OFF")
 
   #: NOTE(HIP/AMD): also provide hip-prefixed targets
-  add_library(hipbench::hipbench ALIAS nvbench::nvbench)
-  add_library(hipbench::main ALIAS nvbench::main)
+  if (HIP_AS_CUDA)
+    if (NOT TARGET hipbench::hipbench)
+      get_target_property(nvbench_orig nvbench::nvbench ALIASED_TARGET)
+      add_library(hipbench::hipbench ALIAS ${nvbench_orig})
+    endif()
+    if (NOT TARGET hipbench::main)
+      get_target_property(main_orig nvbench::main ALIASED_TARGET)
+      add_library(hipbench::main ALIAS ${main_orig})
+    endif()
+  endif()
 
   include("${rapids-cmake-dir}/cpm/detail/display_patch_status.cmake")
   rapids_cpm_display_patch_status(nvbench)
