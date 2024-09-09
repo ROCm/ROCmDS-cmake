@@ -103,7 +103,7 @@ function(rapids_cpm_hipbench)
   endif()
 
   include("${rapids-cmake-dir}/cpm/detail/package_details.cmake")
-  rapids_cpm_package_details(nvbench version repository tag shallow exclude)
+  rapids_cpm_package_details(hipbench version repository tag shallow exclude)
 
   # CUDA::nvml is an optional package and might not be installed ( aka conda )
   #: find_package(CUDAToolkit REQUIRED)
@@ -114,7 +114,7 @@ function(rapids_cpm_hipbench)
   #: endif()
 
   include("${rapids-cmake-dir}/cpm/detail/generate_patch_command.cmake")
-  rapids_cpm_generate_patch_command(nvbench ${version} patch_command)
+  rapids_cpm_generate_patch_command(hipbench ${version} patch_command)
 
   include("${rapids-cmake-dir}/cpm/find.cmake")
   rapids_cpm_find(hipbench ${version} ${ARGN}
