@@ -45,10 +45,10 @@ rapids_cpm_rmm_rocm
 
 .. versionadded:: v21.10.00
 
-Allow projects to find or build HIP `RMM` via `CPM` with built-in
+Allow projects to find or build ROCm `RMM` via `CPM` with built-in
 tracking of these dependencies for correct export support.
 
-Uses the current rapids-cmake version of HIP RMM `as specified in the version file <cpm_versions>`
+Uses the current rapids-cmake version of ROCm RMM `as specified in the version file <cpm_versions>`
 for  consistency across all RAPIDS projects.
 
 .. code-block:: cmake
@@ -87,14 +87,14 @@ function(rapids_cpm_rmm_rocm)
   endif()
 
   include("${rapids-cmake-dir}/cpm/detail/package_details.cmake")
-  rapids_cpm_package_details(rmm-rocm version repository tag shallow exclude)
+  rapids_cpm_package_details("rmm-rocm" version repository tag shallow exclude)
   set(to_exclude OFF)
   if(NOT _RAPIDS_INSTALL_EXPORT_SET OR exclude)
     set(to_exclude ON)
   endif()
 
   include("${rapids-cmake-dir}/cpm/detail/generate_patch_command.cmake")
-  rapids_cpm_generate_patch_command(rmm-rocm ${version} patch_command)
+  rapids_cpm_generate_patch_command("rmm-rocm" ${version} patch_command)
 
   include("${rapids-cmake-dir}/cpm/find.cmake")
   rapids_cpm_find(rmm ${version} ${ARGN} {_RAPIDS_UNPARSED_ARGUMENTS}
