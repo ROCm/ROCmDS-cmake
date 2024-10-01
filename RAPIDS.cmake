@@ -80,7 +80,7 @@ endif()
 # Allow users to control the exact URL passed to FetchContent
 if(NOT rapids-cmake-url)
   if(DEFINED ENV{RAPIDS_CMAKE_URL})
-    set(rapids-cmake-url $ENV{RAPIDS_CMAKE_URL})
+    set(rapids-cmake-url "$ENV{RAPIDS_CMAKE_URL}/")
   else()
     # Construct a default URL if the user doesn't set one
     set(rapids-cmake-url "https://github.com/${rapids-cmake-repo}/")
