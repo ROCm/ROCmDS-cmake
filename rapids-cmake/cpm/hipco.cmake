@@ -111,7 +111,7 @@ function(rapids_cpm_hipco)
 
   include("${rapids-cmake-dir}/cpm/find.cmake")
   rapids_cpm_find(hipco ${version} ${_RAPIDS_UNPARSED_ARGUMENTS}
-                  GLOBAL_TARGETS hipco::hipco
+                  GLOBAL_TARGETS hipco::hipco cuco::cuco
                   CPM_ARGS
                   GIT_REPOSITORY ${repository}
                   GIT_TAG ${tag}
@@ -119,7 +119,7 @@ function(rapids_cpm_hipco)
                   PATCH_COMMAND ${patch_command}
                   EXCLUDE_FROM_ALL ${to_exclude}
                   OPTIONS "BUILD_TESTS OFF" "BUILD_BENCHMARKS OFF" "BUILD_EXAMPLES OFF"
-                          "INSTALL_HIPCO ${to_install}")
+		          "INSTALL_HIPCO ${to_install}" "INSTALL_CUCO ${to_install}")
 
   if (HIP_AS_CUDA)
     if (NOT TARGET cuco::cuco)
