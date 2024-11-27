@@ -119,8 +119,10 @@ function(rapids_cpm_hipco)
                   PATCH_COMMAND ${patch_command}
                   EXCLUDE_FROM_ALL ${to_exclude}
                   OPTIONS "BUILD_TESTS OFF" "BUILD_BENCHMARKS OFF" "BUILD_EXAMPLES OFF"
-		          "INSTALL_HIPCO ${to_install}" "INSTALL_CUCO ${to_install}")
+		  "INSTALL_HIPCO ${to_install}" "INSTALL_CUCO ${to_install}") #NOTE(HIP/AMD): build option INSTALL_HIPCO may be removed in the future.
 
+  # Note: creating the cuco::cuco alias will no longer be required
+  # on future hipCo releases
   if (HIP_AS_CUDA)
     if (NOT TARGET cuco::cuco)
       get_property(hipco_orig TARGET hipco::hipco PROPERTY ALIASED_TARGET)
