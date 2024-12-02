@@ -1,5 +1,5 @@
 #=============================================================================
-# Copyright (c) 2021-2023, NVIDIA CORPORATION.
+# Copyright (c) 2021-2024, NVIDIA CORPORATION.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -78,6 +78,31 @@ function(rapids_cpm_libhipcxx)
   include("${rapids-cmake-dir}/cpm/detail/package_details.cmake")
   rapids_cpm_package_details(libhipcxx version repository tag shallow exclude)
 
+  set(to_install OFF)
+  if(INSTALL_EXPORT_SET IN_LIST ARGN AND NOT exclude)
+    set(to_install ON)
+    # By default if we allow libhipcxx to install into `CMAKE_INSTALL_INCLUDEDIR` alongside rmm (or
+    # other packages) we will get a install tree that looks like this:
+
+    # include/rmm include/cub include/libhipcxx
+
+    # This is a problem for CMake+NVCC due to the rules around import targets, and user/system
+    # includes. In this case both rmm and libhipcxx will specify an include path of `include`,
+    # while libhipcxx tries to mark it as an user include, since rmm uses CMake's default of system
+    # include. Compilers when provided the same include as both user and system always goes with
+    # system.
+
+    # Now while rmm could also mark `include` as system this just pushes the issue to another
+    # dependency which isn't built by RAPIDS and comes by and marks `include` as system.
+
+    # Instead the more reliable option is to make sure that we get libhipcxx to be placed in an
+    # unique include path that the other project will use. In the case of rapids-cmake we install
+    # the headers to `include/rapids/libhipcxx`
+    include(GNUInstallDirs)
+    set(CMAKE_INSTALL_INCLUDEDIR "${CMAKE_INSTALL_INCLUDEDIR}/rapids/libhipcxx")
+    set(CMAKE_INSTALL_LIBDIR "${CMAKE_INSTALL_LIBDIR}/rapids/")
+  endif()
+
   include("${rapids-cmake-dir}/cpm/detail/generate_patch_command.cmake")
   rapids_cpm_generate_patch_command(libhipcxx ${version} patch_command)
 
@@ -87,9 +112,9 @@ function(rapids_cpm_libhipcxx)
                   CPM_ARGS
                   GIT_REPOSITORY ${repository}
                   GIT_TAG ${tag}
-                  GIT_SHALLOW ${shallow}
-                  PATCH_COMMAND ${patch_command}
-                  EXCLUDE_FROM_ALL ${exclude})
+                  GIT_SHALLOW ${shallow} ${patch_command}
+                  EXCLUDE_FROM_ALL ${exclude}
+                  OPTIONS "libhipcxx_ENABLE_INSTALL_RULES ${to_install}")
 
   include("${rapids-cmake-dir}/cpm/detail/display_patch_status.cmake")
   rapids_cpm_display_patch_status(libhipcxx)
@@ -99,54 +124,14 @@ function(rapids_cpm_libhipcxx)
   set(multi_value)
   cmake_parse_arguments(_RAPIDS "${options}" "${one_value}" "${multi_value}" ${ARGN})
 
-  if(libhipcxx_SOURCE_DIR AND _RAPIDS_BUILD_EXPORT_SET)
+  if(libhipcxx_SOURCE_DIR)
     # Store where CMake can find our custom libhipcxx
     include("${rapids-cmake-dir}/export/find_package_root.cmake")
     rapids_export_find_package_root(BUILD libhipcxx "${libhipcxx_SOURCE_DIR}/lib/cmake"
                                     EXPORT_SET ${_RAPIDS_BUILD_EXPORT_SET})
-  endif()
-
-  get_property(rapids_libhipcxx_install_rules_already_called GLOBAL
-  PROPERTY rapids_libhipcxx_install_rules_already_called SET)
-  if(libhipcxx_SOURCE_DIR AND _RAPIDS_INSTALL_EXPORT_SET AND NOT rapids_libhipcxx_install_rules_already_called AND NOT exclude)
-    set_property(GLOBAL PROPERTY rapids_libhipcxx_install_rules_already_called ON)
-    # By default if we allow libhipcxx to install into `CMAKE_INSTALL_INCLUDEDIR` alongside rmm (or
-    # other packages) we will get a install tree that looks like this:
-
-    # install/include/rmm install/include/cub install/include/libhipcxx
-
-    # This is a problem for CMake+NVCC due to the rules around import targets, and user/system
-    # includes. In this case both rmm and libhipcxx will specify an include path of
-    # `install/include`, while libhipcxx tries to mark it as an user include, since rmm uses
-    # CMake's default of system include. Compilers when provided the same include as both user and
-    # system always goes with system.
-
-    # Now while rmm could also mark `install/include` as system this just pushes the issue to
-    # another dependency which isn't built by RAPIDS and comes by and marks `install/include` as
-    # system.
-
-    # Instead the more reliable option is to make sure that we get libhipcxx to be placed in an
-    # unique include path that the other project will use. In the case of rapids-cmake we install
-    # the headers to `include/rapids/libhipcxx`
-    include(GNUInstallDirs)
-    set(CMAKE_INSTALL_INCLUDEDIR "${CMAKE_INSTALL_INCLUDEDIR}/rapids/libhipcxx")
-    set(CMAKE_INSTALL_LIBDIR "${CMAKE_INSTALL_LIBDIR}/rapids/")
-
-    # libhipcxx 1.8 has a bug where it doesn't generate proper exclude rules for the
-    # `[cub|libhipcxx]-header-search` files, which causes the build tree version to be installed
-    # instead of the install version
-    # TODO Change file names containing cudacxx to hipcxx when corresponding changes are
-    # completed in libhipcxx
-    if(NOT EXISTS "${libhipcxx_BINARY_DIR}/cmake/libhipcxxInstallRulesForRapids.cmake")
-      file(READ "${libhipcxx_SOURCE_DIR}/cmake/libhipcxxInstallRules.cmake" contents)
-      string(REPLACE "PATTERN cub-header-search EXCLUDE" "REGEX cub-header-search.* EXCLUDE"
-                     contents "${contents}")
-      string(REPLACE "PATTERN libhipcxx-header-search EXCLUDE"
-                     "REGEX libhipcxx-header-search.* EXCLUDE" contents "${contents}")
-      file(WRITE "${libhipcxx_BINARY_DIR}/cmake/libhipcxxInstallRulesForRapids.cmake" ${contents})
-    endif()
-    set(libhipcxx_ENABLE_INSTALL_RULES ON)
-    include("${libhipcxx_BINARY_DIR}/cmake/libhipcxxInstallRulesForRapids.cmake")
+    rapids_export_find_package_root(INSTALL libhipcxx
+                                    [=[${CMAKE_CURRENT_LIST_DIR}/../../rapids/cmake/libhipcxx]=]
+                                    EXPORT_SET ${_RAPIDS_INSTALL_EXPORT_SET} CONDITION to_install)
   endif()
 
   # Propagate up variables that CPMFindPackage provide
