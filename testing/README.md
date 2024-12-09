@@ -1,4 +1,4 @@
-# RAPIDS CMake Testing for HIP/CUDA
+# ROCm-DS CMake Testing for HIP/CUDA
 
 ## Synopsis
 
