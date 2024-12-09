@@ -26,6 +26,9 @@
 > [!CAUTION]
 > This release is an *early-access* software technology preview. Running production workloads is *not* recommended.
 
+> [!NOTE]
+> This repository will be eventually moved to the [ROCm-DS](https://github.com/rocm-ds) Github organization.
+
 <!-- **NOTE:** For the latest stable [README.md](https://github.com/ROCm/ROCmDS-cmake/blob/main/README.md) ensure you are on the default branch. -->
 
 ## Overview
