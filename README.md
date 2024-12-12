@@ -1,13 +1,45 @@
-# <div align="left"><img src="https://rapids.ai/assets/images/rapids_logo.png" width="90px"/>&nbsp;rapids-cmake</div>
+<!-- MIT License
+  --
+  -- Modifications Copyright (c) 2024 Advanced Micro Devices, Inc.
+  --
+  -- Permission is hereby granted, free of charge, to any person obtaining a copy
+  -- of this software and associated documentation files (the "Software"), to deal
+  -- in the Software without restriction, including without limitation the rights
+  -- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  -- copies of the Software, and to permit persons to whom the Software is
+  -- furnished to do so, subject to the following conditions:
+  --
+  -- The above copyright notice and this permission notice shall be included in all
+  -- copies or substantial portions of the Software.
+  --
+  -- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  -- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  -- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  -- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  -- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  -- SOFTWARE.
+-->
 
-**NOTE:** For the latest stable [README.md](https://github.com/rapidsai/rapids-cmake/blob/main/README.md) ensure you are on the `main` branch.
+# ROCm-DS CMake
+
+> [!CAUTION]
+> This release is an *early-access* software technology preview. Running production workloads is *not* recommended.
+
+> [!NOTE]
+> This repository will be eventually moved to the [ROCm-DS](https://github.com/rocm-ds) Github organization.
+
+<!-- **NOTE:** For the latest stable [README.md](https://github.com/ROCm/ROCmDS-cmake/blob/main/README.md) ensure you are on the default branch. -->
 
 ## Overview
 
-This is a collection of CMake modules that are useful for all CUDA RAPIDS
+This is a collection of CMake modules that are useful for all ROCm-DS
 projects. By sharing the code in a single place it makes rolling out CMake
 fixes easier.
 
+> [!NOTE]
+> This ROCm&trade; port is derived from the NVIDIA RAPIDS&reg; RAPIDS-CMake project. It aims to
+follow the latter's directory structure, file naming and API naming as closely as possible to minimize porting friction for users that are interested in using both projects.
 
 ## Installation
 
@@ -19,7 +51,7 @@ Content](https://cmake.org/cmake/help/latest/module/FetchContent.html) into your
 cmake_minimum_required(...)
 
 if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/<PROJECT>_RAPIDS.cmake)
-  file(DOWNLOAD https://raw.githubusercontent.com/rapidsai/rapids-cmake/branch-<VERSION_MAJOR>.<VERSION_MINOR>/RAPIDS.cmake
+  file(DOWNLOAD https://raw.githubusercontent.com/ROCm/ROCmDS-CMake/branch-<VERSION_MAJOR>.<VERSION_MINOR>/RAPIDS.cmake
     ${CMAKE_CURRENT_BINARY_DIR}/<PROJECT>_RAPIDS.cmake)
 endif()
 include(${CMAKE_CURRENT_BINARY_DIR}/<PROJECT>_RAPIDS.cmake)
@@ -35,11 +67,11 @@ project(....)
 
 Note that we recommend you install `rapids-cmake` into the root `CMakeLists.txt` of
 your project before the first `project` call. This allows us to offer features such as
-`rapids_cuda_architectures()`
+`rapids_hip_architectures()`
 
 ## Usage
 
-`rapids-cmake` provides a collection of useful CMake settings that any RAPIDS project may use.
+`rapids-cmake` provides a collection of useful CMake settings that any ROCmDS project may use.
 While they maybe common, we know that they aren't universal and might need to be composed in
 different ways.
 
@@ -154,7 +186,7 @@ At times projects or developers will need to verify ``rapids-cmake`` branches. T
   #
   set(rapids-cmake-fetch-via-git "ON")
 
-  file(DOWNLOAD https://raw.githubusercontent.com/rapidsai/rapids-cmake/branch-22.10/RAPIDS.cmake
+  file(DOWNLOAD https://raw.githubusercontent.com/ROCm/rapids-cmake/branch-23.12/RAPIDS.cmake
       ${CMAKE_CURRENT_BINARY_DIR}/RAPIDS.cmake)
   include(${CMAKE_CURRENT_BINARY_DIR}/RAPIDS.cmake)
 ```
@@ -166,6 +198,6 @@ A few notes:
 - `rapids-cmake-tag` takes precedence over `rapids-cmake-branch`
 - It is advised to always set `rapids-cmake-version` to the version expected by the repo your modifications will pull
 
-## Contributing
+<!-- ## Contributing
 
-Review the [CONTRIBUTING.md](https://github.com/rapidsai/rapids-cmake/blob/main/CONTRIBUTING.md) file for information on how to contribute code and issues to the project.
+Review the [CONTRIBUTING.md](https://github.com/ROCm/rapids-cmake/blob/main/CONTRIBUTING.md) file for information on how to contribute code and issues to the project. -->
