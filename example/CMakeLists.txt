@@ -13,24 +13,51 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #=============================================================================
+# MIT License
+#
+# Modifications Copyright (c) 2023-2024 Advanced Micro Devices, Inc.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#=============================================================================
+
+#: NOTE(HIP/AMD)
+set(CMAKE_HIP_SOURCE_FILE_EXTENSIONS hip;cu) #: NOTE(HIP/AMD): make *.cu an HIP language extension
+set(CUDA_BACKEND FALSE) #: NOTE(HIP/AMD): not really required, FALSE is actually the default
+set(HIP_AS_CUDA TRUE) #: NOTE(HIP/AMD): not really required, TRUE is actually the default
 
 cmake_minimum_required(VERSION 3.23.1 FATAL_ERROR)
 
 if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/EXAMPLE_RAPIDS.cmake)
-  file(DOWNLOAD https://raw.githubusercontent.com/rapidsai/rapids-cmake/branch-22.10/RAPIDS.cmake
+  file(DOWNLOAD https://raw.githubusercontent.com/ROCm/rapids-cmake/branch-24.06/RAPIDS.cmake
        ${CMAKE_CURRENT_BINARY_DIR}/EXAMPLE_RAPIDS.cmake)
 endif()
 include(${CMAKE_CURRENT_BINARY_DIR}/EXAMPLE_RAPIDS.cmake)
 
 include(rapids-cmake)
 include(rapids-cpm)
-include(rapids-cuda)
+include(rapids-cuda) #: NOTE(HIP/AMD): Delegates to rapids-hip*
 include(rapids-export)
 include(rapids-find)
 
-rapids_cuda_init_architectures(integration)
+rapids_cuda_init_architectures(integration) #: NOTE(HIP/AMD): Delegates to rapids-hip*
 
-project(integration VERSION 21.12 LANGUAGES C CXX CUDA)
+project(integration VERSION 21.12 LANGUAGES C CXX HIP) #: NOTE(HIP/AMD): CUDA->HIP
 message(STATUS "Example: CMAKE_CUDA_ARCHITECTURES: ${CMAKE_CUDA_ARCHITECTURES}")
 
 option(CUDA_STATIC_RUNTIME "Use CUDA static runtime" OFF)
@@ -38,14 +65,16 @@ option(CUDA_STATIC_RUNTIME "Use CUDA static runtime" OFF)
 rapids_cmake_build_type(Release)
 
 # Set the CUDA runtime CUDA targets will use
-rapids_cuda_init_runtime(USE_STATIC ${CUDA_STATIC_RUNTIME})
+rapids_cuda_init_runtime(USE_STATIC ${CUDA_STATIC_RUNTIME}) #: NOTE(HIP/AMD): No support for USE_STATIC != OFF
 
 
 # conda environment
 rapids_cmake_support_conda_env( conda_env MODIFY_PREFIX_PATH )
 
 # Find the CUDAToolkit
-rapids_find_package(CUDAToolkit REQUIRED
+rapids_find_package(#: CUDAToolkit
+                    HIP #: NOTE(HIP/AMD): CUDA->HIP, we could intercept 'CUDAToolkit' in ``rapids_find_package``
+                    REQUIRED
                     BUILD_EXPORT_SET example-targets
                     INSTALL_EXPORT_SET example-targets
                     )
@@ -103,8 +132,8 @@ set_target_properties(example
                # set target compile options
                CXX_STANDARD                        17
                CXX_STANDARD_REQUIRED               ON
-               CUDA_STANDARD                       17
-               CUDA_STANDARD_REQUIRED              ON
+               # CUDA_STANDARD                       17 #: NOTE(HIP/AMD): CUDA->HIP
+               # CUDA_STANDARD_REQUIRED              ON #: NOTE(HIP/AMD): CUDA->HIP
                POSITION_INDEPENDENT_CODE           ON
                INTERFACE_POSITION_INDEPENDENT_CODE ON
                )
@@ -117,6 +146,7 @@ target_link_libraries(example
 
 # Add Conda env exist s, use it for link and include dirs
 if(TARGET conda_env)
+  install(TARGETS conda_env EXPORT example-targets)
   target_link_libraries(example PUBLIC $<BUILD_INTERFACE:conda_env> )
 endif()
 
@@ -158,7 +188,7 @@ set(code_string
 rapids_export(BUILD example
     EXPORT_SET example-targets
     GLOBAL_TARGETS example # since we can't hook into EXPORT SETS
-    LANGUAGES CUDA
+    LANGUAGES HIP #: NOTE(HIP/AMD): CUDA->HIP, we could intercept in ``rapids_export``
     DOCUMENTATION doc_string
     FINAL_CODE_BLOCK code_string
     )
