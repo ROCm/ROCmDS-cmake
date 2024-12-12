@@ -40,7 +40,7 @@ include_guard(GLOBAL)
 include("${rapids-cmake-dir}/cpm/_init_hip_options.cmake")
 
 #[=======================================================================[.rst:
-rapids_cpm_jitify_rocm
+rapids_cpm_jitify_hip
 --------------
 
 .. versionadded:: v21.10.00
@@ -53,11 +53,11 @@ for  consistency across all RAPIDS projects.
 
 .. code-block:: cmake
 
-  rapids_cpm_jitify_rocm( [BUILD_EXPORT_SET <export-name>]
+  rapids_cpm_jitify_hip( [BUILD_EXPORT_SET <export-name>]
                   [INSTALL_EXPORT_SET <export-name>]
                   [<CPM_ARGS> ...])
 
-.. |PKG_NAME| replace:: jitify_rocm
+.. |PKG_NAME| replace:: jitify_hip
 .. include:: common_package_args.txt
 
 Result Targets
@@ -73,7 +73,7 @@ Result Variables
   :cmake:variable:`jitify_VERSION`    is set to the version of Jitify specified by the versions.json.
 
 #]=======================================================================]
-function(rapids_cpm_jitify_rocm)
+function(rapids_cpm_jitify_hip)
   list(APPEND CMAKE_MESSAGE_CONTEXT "rapids.cpm.jitify")
 
   set(options)
@@ -87,14 +87,14 @@ function(rapids_cpm_jitify_rocm)
   endif()
 
   include("${rapids-cmake-dir}/cpm/detail/package_details.cmake")
-  rapids_cpm_package_details("jitify-rocm" version repository tag shallow exclude)
+  rapids_cpm_package_details("jitify-hip" version repository tag shallow exclude)
   set(to_exclude OFF)
   if(NOT _RAPIDS_INSTALL_EXPORT_SET OR exclude)
     set(to_exclude ON)
   endif()
 
   include("${rapids-cmake-dir}/cpm/detail/generate_patch_command.cmake")
-  rapids_cpm_generate_patch_command("jitify-rocm" ${version} patch_command)
+  rapids_cpm_generate_patch_command("jitify-hip" ${version} patch_command)
 
   include("${rapids-cmake-dir}/cpm/find.cmake")
   rapids_cpm_find(jitify ${version} ${ARGN} {_RAPIDS_UNPARSED_ARGUMENTS}
@@ -106,7 +106,7 @@ function(rapids_cpm_jitify_rocm)
                   EXCLUDE_FROM_ALL ${to_exclude})
 
   include("${rapids-cmake-dir}/cpm/detail/display_patch_status.cmake")
-  rapids_cpm_display_patch_status("jitify-rocm")
+  rapids_cpm_display_patch_status("jitify-hip")
 
   # Propagate up variables that CPMFindPackage provide
   set(jitify_SOURCE_DIR "${jitify_SOURCE_DIR}" PARENT_SCOPE)
@@ -119,6 +119,6 @@ endfunction()
 
 if (HIP_AS_CUDA)
   function(rapids_cpm_jitify)
-    rapids_cpm_jitify_rocm(${ARGN})
+    rapids_cpm_jitify_hip(${ARGN})
   endfunction()
 endif()
