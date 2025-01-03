@@ -67,7 +67,7 @@ files to be generated.
 #]=======================================================================]
 function(rapids_test_generate_resource_spec DESTINATION filepath)
   list(APPEND CMAKE_MESSAGE_CONTEXT "rapids.test.generate_resource_spec")
-
+  message(SEND_ERROR "rapids_test_generate_resource_spec")
   if(NOT DEFINED CMAKE_CUDA_COMPILER AND NOT DEFINED CMAKE_CXX_COMPILER)
     message(FATAL_ERROR "rapids_test_generate_resource_spec Requires the CUDA or C++ language to be enabled."
     )
@@ -117,9 +117,9 @@ function(rapids_test_generate_resource_spec DESTINATION filepath)
   endif()
 
   if(NOT EXISTS "${eval_exe}")
-    message(STATUS "rapids_test_generate_resource_spec failed to build detection executable, presuming no GPUs."
+    message(SEND_ERROR "rapids_test_generate_resource_spec failed to build detection executable, presuming no GPUs."
     )
-    message(STATUS "rapids_test_generate_resource_spec compile[${compiler} ${compile_options} ${link_options}] failure details are ${compile_output}"
+    message(SEND_ERROR "rapids_test_generate_resource_spec compile[${compiler} ${compile_options} ${link_options}] failure details are ${compile_output}"
     )
     file(WRITE "${filepath}" "${gpu_json_contents}")
   else()
