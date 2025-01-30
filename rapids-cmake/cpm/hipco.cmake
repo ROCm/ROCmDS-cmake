@@ -110,16 +110,38 @@ function(rapids_cpm_hipco)
   rapids_cpm_generate_patch_command(hipco ${version} patch_command)
 
   include("${rapids-cmake-dir}/cpm/find.cmake")
-  rapids_cpm_find(hipco ${version} ${_RAPIDS_UNPARSED_ARGUMENTS}
-                  GLOBAL_TARGETS hipco::hipco cuco::cuco
+  rapids_cpm_find(cuco ${version}
+                  GLOBAL_TARGETS cuco
                   CPM_ARGS
                   GIT_REPOSITORY ${repository}
                   GIT_TAG ${tag}
                   GIT_SHALLOW ${shallow}
-                  PATCH_COMMAND ${patch_command}
-                  EXCLUDE_FROM_ALL ${to_exclude}
-                  OPTIONS "BUILD_TESTS OFF" "BUILD_BENCHMARKS OFF" "BUILD_EXAMPLES OFF"
-		  "INSTALL_HIPCO ${to_install}" "INSTALL_CUCO ${to_install}") #NOTE(HIP/AMD): build option INSTALL_HIPCO may be removed in the future.
+                  PATCH_COMMAND ${patch_command})
+  if(TARGET cuco)
+    rapids_cpm_find(cuco ${version} ${_RAPIDS_UNPARSED_ARGUMENTS}
+                    GLOBAL_TARGETS cuco::cuco
+                    CPM_ARGS
+                    GIT_REPOSITORY ${repository}
+                    GIT_TAG ${tag}
+                    GIT_SHALLOW ${shallow}
+                    PATCH_COMMAND ${patch_command}
+                    EXCLUDE_FROM_ALL ${to_exclude}
+                    OPTIONS "BUILD_TESTS OFF" "BUILD_BENCHMARKS OFF" "BUILD_EXAMPLES OFF"
+                    "INSTALL_HIPCO ${to_install}" "INSTALL_CUCO ${to_install}") #NOTE(HIP/AMD): build option INSTALL_HIPCO may be removed in the future.
+    set(PACKAGE_NAME cuco)
+  else()
+    rapids_cpm_find(hipco ${version} ${_RAPIDS_UNPARSED_ARGUMENTS}
+                    GLOBAL_TARGETS hipco::hipco
+                    CPM_ARGS
+                    GIT_REPOSITORY ${repository}
+                    GIT_TAG ${tag}
+                    GIT_SHALLOW ${shallow}
+                    PATCH_COMMAND ${patch_command}
+                    EXCLUDE_FROM_ALL ${to_exclude}
+                    OPTIONS "BUILD_TESTS OFF" "BUILD_BENCHMARKS OFF" "BUILD_EXAMPLES OFF"
+                    "INSTALL_HIPCO ${to_install}" "INSTALL_CUCO ${to_install}") #NOTE(HIP/AMD): build option INSTALL_HIPCO may be removed in the future.
+    set(PACKAGE_NAME hipco)
+  endif()
 
   # Note: creating the cuco::cuco alias will no longer be required
   # on future hipCo releases
@@ -138,15 +160,15 @@ function(rapids_cpm_hipco)
   rapids_cpm_display_patch_status(hipco)
 
   # Propagate up variables that CPMFindPackage provide
-  set(hipco_SOURCE_DIR "${hipco_SOURCE_DIR}" PARENT_SCOPE)
-  set(hipco_BINARY_DIR "${hipco_BINARY_DIR}" PARENT_SCOPE)
-  set(hipco_ADDED "${hipco_ADDED}" PARENT_SCOPE)
+  set(hipco_SOURCE_DIR "${${PACKAGE_NAME}_SOURCE_DIR}" PARENT_SCOPE)
+  set(hipco_BINARY_DIR "${${PACKAGE_NAME}_BINARY_DIR}" PARENT_SCOPE)
+  set(hipco_ADDED "${${PACKAGE_NAME}_ADDED}" PARENT_SCOPE)
   set(hipco_VERSION ${version} PARENT_SCOPE)
 
   if (HIP_AS_CUDA)
-    set(cuco_SOURCE_DIR "${hipco_SOURCE_DIR}" PARENT_SCOPE)
-    set(cuco_BINARY_DIR "${hipco_BINARY_DIR}" PARENT_SCOPE)
-    set(cuco_ADDED "${hipco_ADDED}" PARENT_SCOPE)
+    set(cuco_SOURCE_DIR "${${PACKAGE_NAME}_SOURCE_DIR}" PARENT_SCOPE)
+    set(cuco_BINARY_DIR "${${PACKAGE_NAME}_BINARY_DIR}" PARENT_SCOPE)
+    set(cuco_ADDED "${${PACKAGE_NAME}_ADDED}" PARENT_SCOPE)
     set(cuco_VERSION ${version} PARENT_SCOPE)
   endif()
 
