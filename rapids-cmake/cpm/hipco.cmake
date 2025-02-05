@@ -54,11 +54,14 @@ across all RAPIDS projects.
 .. note::
 
   If the option `HIP_AS_CUDA` is set, ``cuco``-prefixed result variables and targets are available too after calling this function.
+  PACKAGE_NAME can be used to override the expected default package name "cuco" for backwards compatibility with older hipco versions,
+  where the package name "hipco" was used.
 
 .. code-block:: cmake
 
   rapids_cpm_hipco( [BUILD_EXPORT_SET <export-name>]
                    [INSTALL_EXPORT_SET <export-name>]
+                   [PACKAGE_NAME <package-name>]
                    [<CPM_ARGS> ...])
 
 .. |PKG_NAME| replace:: hipco
@@ -87,9 +90,16 @@ function(rapids_cpm_hipco)
   list(APPEND CMAKE_MESSAGE_CONTEXT "rapids.cpm.hipco")
 
   set(options)
-  set(one_value INSTALL_EXPORT_SET)
+  set(one_value INSTALL_EXPORT_SET PACKAGE_NAME)
   set(multi_value)
   cmake_parse_arguments(_RAPIDS "${options}" "${one_value}" "${multi_value}" ${ARGN})
+
+  # Set PACKAGE_NAME to 'cuco' if not provided
+  if(NOT _RAPIDS_PACKAGE_NAME)
+    set(hipco_package_name "cuco")
+  else()
+    set(hipco_package_name ${_RAPIDS_PACKAGE_NAME})
+  endif()
 
   # Fix up _RAPIDS_UNPARSED_ARGUMENTS to have INSTALL_EXPORT_SET as this is need for rapids_cpm_find
   set(to_install OFF)
@@ -110,7 +120,10 @@ function(rapids_cpm_hipco)
   rapids_cpm_generate_patch_command(hipco ${version} patch_command)
 
   include("${rapids-cmake-dir}/cpm/find.cmake")
-  rapids_cpm_find(hipco ${version} ${_RAPIDS_UNPARSED_ARGUMENTS}
+
+  # TODO(HIP/AMD): WAR for older hipCo versions where the project name is hipCo.
+  # To be removed in the future when support for older hipCo versions is no longer needed.
+  rapids_cpm_find(${hipco_package_name} ${version} ${_RAPIDS_UNPARSED_ARGUMENTS}
                   GLOBAL_TARGETS hipco::hipco cuco::cuco
                   CPM_ARGS
                   GIT_REPOSITORY ${repository}
