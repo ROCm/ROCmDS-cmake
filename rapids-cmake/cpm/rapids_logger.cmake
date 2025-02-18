@@ -55,7 +55,7 @@ function(rapids_cpm_rapids_logger)
             GIT_REPOSITORY ${repository}
             GIT_TAG ${tag}
             GIT_SHALLOW ${shallow} ${patch_command}
-            OPTIONS "BUILD_TESTS OFF")
+            OPTIONS "BUILD_TESTS OFF;BUILD_SHARED_LIBS OFF;FMT_HEADER_ONLY=0")
 
     include("${rapids-cmake-dir}/cpm/detail/display_patch_status.cmake")
     rapids_cpm_display_patch_status(logger)
